@@ -1,0 +1,619 @@
+---
+title: "Stop Motion Videos...in Slack? Spice Up Your Profile Picture with Cron Jobs & Github Actions!"
+slug: "stop-motion-videos-in-slack"
+date: "2021-03-15T20:30:13.000Z"
+date_updated: "2021-03-15T20:30:35.000Z"
+tags: tutorial
+description: "Slack motion videos...in slack? Update your profile throughout the day."
+feature_image: /images/slack-stop-motion-cover.png
+---
+
+# Stop Motion Videos...in Slack? Spice Up Your Profile Picture with Cron Jobs & Github Actions!
+
+Over the past year, many of us have been working from home with most of our communication happening on Slack. We can use our status to update our current situation whether it is in a heads down coding mode (do not disturb), out at lunch, at a doctors appointment, on vacation, not feeling well, or whatever emoji and text you are feeling.
+
+The idea for this came from a simple question "what if people could know your status just by viewing your profile picture?"
+
+## The Idea
+
+**Update my profile picture in Slack throughout the day based on the time without being too disruptive**.
+
+A key part of this plan is that some people use other people's profile picture as a quick "who am I talking to" reference. Instead of reading names in the sidebar or the chat, they have become accustomed to one's profile picture. The images needed to update often enough to change "state" but not be too dramatic of changes to interrupt coworker's "flow."
+
+**Slack Stop Motion was born.**
+
+<img alt="Slack Stop Motion" src="../images/slack-gif.gif" width="100%" />
+
+## Implementation
+
+From my initial idea and my requirements, I started brainstorming _how_ to implement the idea. What I landed on was pretty simple:
+
+- A set of photos of me coming into the office and then a set of photos of me leaving the office
+- A cron job
+- Slack API
+- Github Action
+
+### Images
+
+I've taken so many images with my webcam to try and figure this part out. I have a Logitech C920 that I thought would work but kept on running into small but frustrating issues. I used a terminal command to take pictures every 1 second to slowly move out of the camera, but the images there were quite grainy and low resolution. I tried using my Bluetooth mouse to click "capture" once I was in place, but those images ended up not being cohesive enough.
+
+The last thing I did was put my iPhone on this $10 Amazon selfie stick that contains a Bluetooth button to trigger the capture. This solution worked out best in terms of quality and ease of use.
+
+### Cron Job
+
+A cron job was the simplest solution and the one that immediately came to mind. I wanted to have the photos update on a fairly defined cadence and on certain days of the week (I am excluding weekends). Cron can do all that for you - and more!
+
+### Slack API
+
+Integrating the Slack API took some messing around with but their documentation is easy to follow and click through to get what you need. The only things you need to get the Slack API working are:
+
+- A Slack App installed on your workspace
+- The `users.profile:write` role grant for the app
+
+From there, it's just like calling an API!
+
+### Github Actions
+
+I thought about looking into more defined solutions from Google, AWS, and Microsoft, but at the end of the day, remember this is just a simple cron job. I didn't want to over architect a cron job. I learned that Github Actions can do a simple cron that can run whenever you define it - perfect!
+
+## Tutorial
+
+Below is the step-by-step guide of how to set up your instance. I also have a [public Github repository](https://github.com/kevinguebert/slack-stop-motion) of what I'm using now if you'd like to visit that as well.
+
+### Gather Images
+
+The first thing to do is to grab all your photos and map out _when_ you want to update your profile and to _what_ picture. This can be a fairly intensive task as it depends on the number of photos you have, your work hours, how often you want to update, etc.
+
+:::note
+
+**I am not including this in part of the tutorial.** Take your own photos! It's fun to do and you can spice it up to however you like.
+
+:::
+
+:::tip
+
+- You'll want to think about **how many** pictures you want to take and **what time** they would appear. The number of photos determines **when** the cron job should run.
+  - If you want it to run on the hour every hour from 8:00AM to 5:00PM, you'll need about **10 photos**.
+  - If you want it to run every 30 minutes, you'll need about **20 photos**.
+  - You can do the math for your situation. (I had to break out the counting on my hand for this.)
+- Name your images what time you want them to show up. This will make it easier when we build out the script.
+
+:::
+
+I created a folder on my Desktop, I named it `images`, and I added my images in there.
+
+![Images folder desktop](../../images/imags-folder-desktop.png)
+
+Here are all my images in gif form to help get an understanding of how I flowed them:
+
+<img width="50%" alt="Slack Stop Motion" src="/images/slack-stop-motion.gif" />
+
+### Create a Slack App
+
+In this tutorial, we are only creating a one-off Slack app. If you want to look into how to create one that other people can sign in with, capture their tokens, be secure, and market, be my guest.
+
+1. Visit your Slack workspace, click on the workspace name in the top left and then go to Settings & Administation -> Manage apps
+
+   ![Manage App](../../images/slack-1.1.png)
+
+2. From there, in the top right, click on "Build"
+
+   ![Build](../../images/slack-2.1.png)
+
+3. Click "Create New App", give it a name, and add it to your Slack Workspace
+
+   ![Create App](../../images/slack-3.1.png)
+   ![Name App](../../images/slack-4.1.png)
+
+4. From here, on the left-hand side under "Features" click on "OAuth & Permissions"
+
+   ![Oauth and Permissions](../../images/slack-oauth.png)
+
+5. Scroll down to "Scopes" and find "User Token Scopes"
+
+6. Click "Add an Oauth Scope" and search for `users.profile:write`
+   ![Scopes](../../images/slack-5.1.png)
+
+7. Now scroll back up to the top and under the "Oath Tokens & Redirect URLs" click on "Install to Workspace"
+
+   ![Scopes](../../images/slack-7.1.png)
+
+8. Allow the app to be installed on your workspace
+   ![Install](../../images/slack-8.1.png)
+
+9. After installation, you will see the title "User Oauth Token" - **this is very important** - this is how we access the Slack API. Copy and save this to a safe location for now.
+   ![Important Token](../../images/slack-9.1.png)
+
+### Creating the Script
+
+1. Now that we have our images and our Slack API key, we can go ahead and create our script locally to test it out. The script is **really, really basic**. Here's a brief overview:
+
+   - Get's the current hour
+   - Get's the current minute
+   - A lot of `switch` and `if` statements.
+
+   Super basic, I know.
+
+2. To create our script, let's create a file called `slack-stop-motion.sh`
+
+3. Open up the file in your favorite code editor and add we are going to add our code to get the current hour and the current minute:
+
+   ```bash
+   #!/bin/bash
+
+   hour=$(TZ=":America/New_York" date +%H)
+   minute=$(TZ=":America/New_York" date +%M)
+   ```
+
+4. With those two values, we can do our math/configuration of "at what time we want certain photos to display:.
+
+5. I have **30 images** and I want them to change **every 20 minutes**. So I did some sweet calculations, determined what image I wanted when and made those `if` statements work. All I'm doing is checking the hour and then checking what minute it currently is to determine if it is the 0th, 20th, or 40th minute. 🙃
+
+   :::note
+
+   Your images and timing will be different than mine! Probably _very_ different. Unless you have the same image name and timing structure, this won't work. I also use `America/New_York` as my timezone.
+
+   :::
+
+   :::note
+
+   I set my "default" image to be when I am "away".
+
+   :::
+
+   ```bash {6-108}
+   #!/bin/bash
+
+   hour=$(TZ=":America/New_York" date +%H)
+   minute=$(TZ=":America/New_York" date +%M)
+
+   img="1740.jpg"
+
+   case $hour in
+   7)
+   if (($minute < 20)); then
+      img="0700.jpg"
+   elif (($minute < 40)): then
+      img="0720.jpg"
+   else
+      img="0740.jpg"
+   fi
+   ;;
+   8)
+   if (($minute < 20)); then
+      img="0800.jpg"
+   elif (($minute < 40)): then
+      img="0820.jpg"
+   else
+      img="0840.jpg"
+   fi
+   ;;
+   9)
+   if (($minute < 20)); then
+      img="0900.jpg"
+   elif (($minute < 40)): then
+      img="0920.jpg"
+   else
+      img="0940.jpg"
+   fi
+   ;;
+   10)
+   if (($minute < 20)); then
+      img="1000.jpg"
+   elif (($minute < 40)): then
+      img="1020.jpg"
+   else
+      img="1040.jpg"
+   fi
+   ;;
+   11)
+   if (($minute < 20)); then
+      img="1100.jpg"
+   elif (($minute < 40)): then
+      img="1120.jpg"
+   else
+      img="1140.jpg"
+   fi
+   ;;
+   12)
+   if (($minute < 20)); then
+      img="1200.jpg"
+   elif (($minute < 40)): then
+      img="1220.jpg"
+   else
+      img="1240.jpg"
+   fi
+   ;;
+   13)
+   if (($minute < 20)); then
+      img="1300.jpg"
+   elif (($minute < 40)): then
+      img="1320.jpg"
+   else
+      img="1340.jpg"
+   fi
+   ;;
+   14)
+   if (($minute < 20)); then
+      img="1400.jpg"
+   elif (($minute < 40)): then
+      img="1420.jpg"
+   else
+      img="1440.jpg"
+   fi
+   ;;
+   15)
+   if (($minute < 20)); then
+      img="1500.jpg"
+   elif (($minute < 40)): then
+      img="1520.jpg"
+   else
+      img="1540.jpg"
+   fi
+   ;;
+   16)
+   if (($minute < 20)); then
+      img="1600.jpg"
+   elif (($minute < 40)): then
+      img="1620.jpg"
+   else
+      img="1640.jpg"
+   fi
+   ;;
+   17)
+   if (($minute < 20)); then
+      img="1700.jpg"
+   elif (($minute < 40)): then
+      img="1720.jpg"
+   else
+      img="1740.jpg"
+   fi
+   ;;
+   esac
+   ```
+
+6. Could this be more efficient? Oh you betcha. But that's for another time.
+
+7. Let's make sure we set the current image path based on our folder structure:
+
+   ```bash {6}
+   <!-- ...previous code -->
+
+   img="./images/${img}"
+   ```
+
+8. Finally, we can now send our request to Slack! We will be making a simple `curl` `POST` request.
+
+   ```bash {5}
+   <!-- ...previous code -->
+
+   img="./images/${img}"
+
+   curl --location --request POST 'https://slack.com/api/users.setPhoto' --form "token=xoxp-XYZ" --form "image=@${img}"
+   ```
+
+   :::note
+
+   Be sure to replace `xoxp-XYZ` with your actual Slack API token from before!
+
+   :::
+
+9. Return to your terminal and we can now safely run the script:
+
+   ```shell
+   sh ./slack-stop-motion.sh
+   ```
+
+10. Hopefully there is a successful response like below. If not, [tweet at me](https://twitter.com/kevinguebert) and I will try and help you out!
+
+    ```json
+    {
+      "ok": true,
+      "profile": {
+        "image_24": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_24.jpg",
+        "image_32": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_32.jpg",
+        "image_48": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_48.jpg",
+        "image_72": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_72.jpg",
+        "image_192": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_192.jpg",
+        "image_512": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_512.jpg",
+        "image_1024": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_1024.jpg",
+        "image_original": "https://avatars.slack-edge.com/2021-03-24/1919928028576_d0f5e53078c3e08fbcd3_original.jpg",
+        "avatar_hash": "d0f5e53078c3"
+      }
+    }
+    ```
+
+    :::note
+
+    Depending on the time of day, the image that shows up may not be what you "expect". Be sure to double-check!
+
+    :::
+
+11. Here's our full script that we will then use later on:
+
+    ```bash
+    #!/bin/bash
+
+    hour=$(TZ=":America/New_York" date +%H)
+    minute=$(TZ=":America/New_York" date +%M)
+
+    img="1740.jpg"
+
+    case $hour in
+    7)
+    if (($minute < 20)); then
+       img="0700.jpg"
+    elif (($minute < 40)): then
+       img="0720.jpg"
+    else
+       img="0740.jpg"
+    fi
+    ;;
+    8)
+    if (($minute < 20)); then
+       img="0800.jpg"
+    elif (($minute < 40)): then
+       img="0820.jpg"
+    else
+       img="0840.jpg"
+    fi
+    ;;
+    9)
+    if (($minute < 20)); then
+       img="0900.jpg"
+    elif (($minute < 40)): then
+       img="0920.jpg"
+    else
+       img="0940.jpg"
+    fi
+    ;;
+    10)
+    if (($minute < 20)); then
+       img="1000.jpg"
+    elif (($minute < 40)): then
+       img="1020.jpg"
+    else
+       img="1040.jpg"
+    fi
+    ;;
+    11)
+    if (($minute < 20)); then
+       img="1100.jpg"
+    elif (($minute < 40)): then
+       img="1120.jpg"
+    else
+       img="1140.jpg"
+    fi
+    ;;
+    12)
+    if (($minute < 20)); then
+       img="1200.jpg"
+    elif (($minute < 40)): then
+       img="1220.jpg"
+    else
+       img="1240.jpg"
+    fi
+    ;;
+    13)
+    if (($minute < 20)); then
+       img="1300.jpg"
+    elif (($minute < 40)): then
+       img="1320.jpg"
+    else
+       img="1340.jpg"
+    fi
+    ;;
+    14)
+    if (($minute < 20)); then
+       img="1400.jpg"
+    elif (($minute < 40)): then
+       img="1420.jpg"
+    else
+       img="1440.jpg"
+    fi
+    ;;
+    15)
+    if (($minute < 20)); then
+       img="1500.jpg"
+    elif (($minute < 40)): then
+       img="1520.jpg"
+    else
+       img="1540.jpg"
+    fi
+    ;;
+    16)
+    if (($minute < 20)); then
+       img="1600.jpg"
+    elif (($minute < 40)): then
+       img="1620.jpg"
+    else
+       img="1640.jpg"
+    fi
+    ;;
+    17)
+    if (($minute < 20)); then
+       img="1700.jpg"
+    elif (($minute < 40)): then
+       img="1720.jpg"
+    else
+       img="1740.jpg"
+    fi
+    ;;
+    esac
+    img="./images/${img}"
+
+    curl --location --request POST 'https://slack.com/api/users.setPhoto' --form "token=xoxp-XYZ" --form "image=@${img}"
+    ```
+
+### Setting up Github Repository
+
+1. Be sure you have a [Github Account](https://github.com);
+2. Next, create a new repository. I named mine `slack-stop-motion` but you can name yours whatever you like. Click the green "Create" button at the bottom of the page.
+
+![Create New Repository](../../images/new-repository.png)
+
+3. On the next page, there will be a bunch of information about adding files to your Github repository. Under the "Quick Setup" headline, there is a link that says "uploading an existing file". This is how we will add our images.
+
+![Upload Existing File](../../images/upload-existing.png)
+
+4. It will probably be easier to drag and drop your whole folder in on this UI to add your images to the repository.
+
+![Add Files](../../images/add-files.png)
+
+5. **Make sure to scroll to the bottom to commit your changes!**
+
+![Commit Images](../../images/commit-changes-2.png)
+
+6. Once they are finished uploading, you should be taken back to your repository homepage with your images folder.
+
+![Repository Homepage](../../images/images-github.png)
+
+7. The last thing we are going to do is to add our `slack-stop-motion.sh` script to the repository as well.
+
+<a href="#edit-bash-before-upload" />
+
+:::warning
+
+Edit your `slack-stop-motion.sh` file and **remove your key** from the file and replace it with `${TOKEN}`. The `curl` command should look like the following:
+
+```bash
+curl --location --request POST 'https://slack.com/api/users.setPhoto' --form "token=${TOKEN}" --form "image=@${img}"
+```
+
+:::
+
+9.  Next, go through the same process of uploading your file like you did with the images.
+
+![Upload Individual File](../../images/add-file.png)
+![Repo with Script](../../images/uploaded-script.png)
+
+### Adding Your Slack Key
+
+1. In order to safely and securely use the Slack API, we need to add our Slack API key to our repository. Thankfully, Github has thought of this problem and solved it for us!
+
+2. Click on "Settings" and then click on "Secrets" in the sidebar.
+
+![Settings & Secret](../../images/settings.png)
+
+3. Click "New Repository Secret"
+
+![New Repository Secret](../../images/add-secret.png)
+
+4. Create a secret with the name: "TOKEN" and paste in your Slack API Key from above. (Hint, it should start with `xoxp` if you followed the steps correctly.)
+
+![Slack API Token](../../images/token-secret.png)
+
+### Creating Your Github Action
+
+1. Our Github Action will be the foundation of our project. To get started, click on "Actions". (Don't see Github Actions? [Visit the Documentation](https://docs.github.com/en/actions) to learn more about how to get started.)
+
+![Github Actions](../../images/actions-tab.png)
+
+2. Click "set up a workflow yourself"
+
+![Set up a workflow yourself](../../images/set-up-own-action.png)
+
+3. Now we are onto some coding! This is where some of your custom configuration may come in; I run my cron job every 20 minutes between the hours of 7AM and 5PM. Here is the start of what my workflow looks like:
+
+   ```yaml
+   name: Slack Stop Motion
+   on:
+     schedule:
+       - cron: "*/20 11-21 * * mon-fri"
+   ```
+
+   :::note
+
+   Cron can do some marvelous things. Visit [https://crontab.guru](https://crontab.guru) to schedule to your heart's desire!
+
+   Also note - check the timezone for cron on Github! It isn't Eastern 😬 that's why the cron is from 11-21 to account for the time difference.
+
+   :::
+
+4. The next part of our workflow is calling the script we made earlier. There are a couple steps here that we want to make sure to hit:
+
+   - Make sure the system has permissions to run the script (`chmod`)
+   - Make sure our `TOKEN` from our environment secrets is defined in the environment
+   - Call our script _with the token_.
+
+   :::note
+
+   Make sure the `slack-stop-motion.sh` script doesn't contain your actual Slack key but instead is replaced with `${TOKEN}`. [Revisit the previous steps](/#edit-bash-before-upload) if you're confused.
+
+   Slack will turn off the key if you do accidentally make it public. If that happens, reinstall your app in your workspace.
+
+   :::
+
+5. We can add those steps to our workflow with the following:
+
+   ```yaml
+   name: Slack Stop Motion
+   on:
+   schedule:
+     - cron: "*/20 11-21 * * mon-fri"
+   jobs:
+     cron:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v2
+         - run: |
+             chmod +x "${GITHUB_WORKSPACE}/slack-stop-motion.sh"
+             export TOKEN=${{ secrets.SLACK_TOKEN }}
+             "${GITHUB_WORKSPACE}/slack-stop-motion.sh"
+   ```
+
+6. Our workflow is complete! **Make sure you commit** your file by clicking "Start Commit" on the right side.
+
+With any luck, we've made it through this tutorial with a running cron job in Github Actions. You can leave your Action alone and it will all work for you. If you check the Actions tab you will see it running every 20 minutes between 7:00AM and 5:00PM.
+
+![Final Workflow](../../images/final-workflow.png)
+
+<Heading as="h3" size="xl" textAlign="center">
+  🎉🎉🎉 You did it! 🎉🎉🎉
+</Heading>
+
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<lottie-player src="https://assets9.lottiefiles.com/packages/lf20_pkanqwys.json" background="transparent" speed="1" style={{width: '100%', height: '300px'}} loop autoplay></lottie-player>
+
+With your Slack API Key, your images, and your Github actions, you can now enjoy your very own Slack Stop Motion!
+
+<img alt="Slack Stop Motion" src="/images/slack-gif.gif" width="100%" />
+
+## Feedback and Questions
+
+You can find me on Twitter [@kevinguebert](https://twitter.com/kevinguebert) and I am open to all questions! You can also find the [Github repo](https://github.com/kevinguebert/slack-stop-motion) where I have my images and code available for reference.
+
+<LinkBox as="button">
+  <Button variant="outline">
+    <LinkOverlay href="https://twitter.com/kevinguebert">
+      Tweet at me
+    </LinkOverlay>
+  </Button>
+</LinkBox>
+
+<LinkBox as="button">
+  <Button variant="outline">
+    <LinkOverlay href="https://github.com/kevinguebert/slack-stop-motion">
+      Visit Github
+    </LinkOverlay>
+  </Button>
+</LinkBox>
+
+## Twitch Livestream
+
+:::note
+
+The livestream on Twitch was done at the start of the project while I was still learning. Don't follow this word-for-word as things have changed!
+
+:::
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/iEcwb8Tay40"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+```

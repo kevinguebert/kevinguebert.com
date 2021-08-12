@@ -1,0 +1,53 @@
+---
+title: "Harvy (iOS)"
+type: page
+slug: "harvy-ios"
+date: "2020-09-28T13:14:22.000Z"
+date_updated: "2020-09-29T19:29:50.000Z"
+description: "Harvy analyzes the route ahead, the elevation profile, and the difficulty of the path and then queues music to match. By providing seed songs, Harvy uses the Spotify recommendation engine alongside Harvy's difficulty algorithm to create the best experience for runners."
+---
+
+# Harvy (iOS)
+
+When I first started Harvy, the long term goal was always to develop an app for a user's phone. I wanted this to happen live, while a user was running, with little work on the user's end. This goal came to fruition in the fall of 2019 with the launch of the iOS app on the Apple App Store.
+
+<a
+  href="https://apps.apple.com/us/app/harvy-running-companion/id1455035704?ls=1p"
+  target="_blank"
+>
+  <button variant="link">Download in App Store</button>
+</a>
+
+## How it works
+
+Harvy analyzes the route ahead, the elevation profile, and the difficulty of the path and then queues music to match. By providing seed songs, Harvy uses the Spotify recommendation engine alongside Harvy's difficulty algorithm to create the best experience for runners.
+![iOS App](../../images/5f18c102a9ac2868f4a3464d_826975bf-0438-4250-b77f-07d5b0321dbf--1-.jpeg)
+
+## Building with React Native
+
+### Version 1.0
+
+In the spirit of being a solo-founder and developer, my goal was to get a product out to the users as quickly as possibly. With Harvy for the web built in React and the rumblings about React Native being so positive, my first application for Harvy was built with React Native. I was able to quickly create a "version 1" with React Native and was proud and surprised about how easy of a transition it was. I was able to reuse much of my backend helpers, and pretty seamlessly copy over components.
+
+During the early stages I was even compiling for Android and iOS simultaneously with hopes of launching on both platforms.Unfortunately those dreams came to a crashing halt when integrating with Spotify. Within the past two years, Spotify updated their SDKs with more functionality and better support for iOS and Android. Unfortunately, the companion, open-source NPM package was on the previous version of the SDK. That meant that only Spotify Premium users could use Spotify in my app because that is what the SDK supported...not free users.
+
+I was swiftly rejected by Apple because the first version of my application didn't allow free/non-premium Spotify users to use the app (due to the SDK not allowing it). I ended up passing Apple review by having a basic version of the app that did none of the music features. It ended up being a simple running tracker. This was not good enough for me. Harvy's selling point was the integration of music and having users download the app and then find out they couldn't use the music seemed like a lie. Thus, a rewrite.
+
+## Rewrite in Swift
+
+### Version 2.0
+
+Using what I learned from my first job out of college, I rewrote Harvy using Swift. This allowed me to use the native Spotify SDK and have free and premium Spotify users play music. The experience for free users is similar than with the Spotify app - they will still receive ads. The first Swift version of Harvy ended up with too many features that included social features such as liking and following other friends. These features were then removed as they ended up being too heavy and slow for the application and the user experience.
+
+![Landing](../../images/5f18dd0f19b6a133f4ec6040_a5a8d6aa-58f2-4cf2-85ac-f9dfb719b7c9-p-1080.jpeg)
+
+## The Future
+
+Harvy for iOS is still in active development. If you have any request, comments, or feedback, please let me know below.
+
+<a
+  href="https://apps.apple.com/us/app/harvy-running-companion/id1455035704?ls=1p"
+  target="_blank"
+>
+  <button variant="link">Download in App Store</button>
+</a>

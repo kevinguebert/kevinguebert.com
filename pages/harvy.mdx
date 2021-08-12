@@ -1,0 +1,93 @@
+---
+title: "Harvy"
+type: page
+slug: "harvy"
+date: "2020-09-28T13:14:22.000Z"
+date_updated: "2020-09-29T19:29:50.000Z"
+description: "By analyzing the elevation changes along a route to create a difficulty rating for specific segments, Harvy correlates music tempo and beats per minute to this difficulty rating. Have a big hill coming up in the next mile? Harvy picks a song to help you push through."
+---
+
+# Harvy 
+
+## About
+
+_Status:_ Launched 🚀
+
+_Started:_ February 2018
+
+_Role:_ Solo-founder & Developer
+
+_URL:_ [https://harvy.app](https://harvy.app/)
+
+## Project Overview
+
+There are moments while running and exercising where something incredible happens - everything clicks into place, you can feel your heart beating, you are pushing out of your comfort zone, and you know at the end of it you will emerge triumphant.
+
+Harvy is my attempt to create these moments in combination with music and running. When a person is running, there is more data than just the regular cadence and beats per minute (BPM). If a user maps out a route and plans ahead, we can know so much more based on the geographical conditions of the run. The main questions Harvy looks out for are: Where are the hills? Where will it be most difficult?
+
+By analyzing the elevation changes along a route to create a difficulty rating for specific segments, Harvy correlates music tempo and beats per minute to this difficulty rating. Have a big hill coming up in the next mile? Harvy picks a song to help you push through.
+
+![Landing](../../images/5f046a4fe04b9600740f7272_Screen-Shot-2020-07-07-at-8.27.48-AM-p-1080.png)
+
+<Gallery
+  first={{
+    src:
+      "/images/5f0755c400104548ac5d85a8_Screen-Shot-2020-07-09-at-1.30.25-PM-p-500-1.png",
+    alt: "Profile",
+  }}
+  second={{
+    src:
+      "/../images/5f0755c500104541d05d85a9_Screen-Shot-2020-07-09-at-1.34.29-PM-p-500-1.png",
+    alt: "Activity List",
+  }}
+/>
+
+![Activity Detail](../../images/5f0755c44a6e283f578ab169_Screen-Shot-2020-07-09-at-1.31.58-PM-p-1080-1.png)
+
+## Integrating Google Maps & Spotify
+
+Harvy would not exist without the public APIs provided by Google and Spotify. I will not pretend that I know anything about music theory, recommendation algorithms, or predictive mapping. However, Spotify and Google have teams built specifically for those tasks and then provide the opportunity for developers like myself to utilize them.
+
+### Step One
+
+#### Drawing the Route
+
+For the web, Harvy is all about planning ahead for your run. Harvy allows users to draw out where they would like to go by connecting dots on a map. A user has the ability to view elevation along with their predicted duration based off of their pace.
+![Draw Map](../../images/5f0755c5087acc6c2ed596d6_Screen-Shot-2020-07-09-at-1.32.31-PM-p-800.png)
+
+### Step Two
+
+#### Inputting Seed Songs
+
+Harvy unfortunately is not all-knowing so it needs a little help in understanding what type of music a user would like listen to while running. A user has the ability to input 5 seed songs that Harvy then builds a playlist from.
+![Seed Tracks](../../images/5f0755c50f194e2c26760dd8_Screen-Shot-2020-07-09-at-1.32.51-PM-p-800.png)
+
+### Step Three
+
+#### Generating the Playlist
+
+From the seed songs, Harvy analyzes the elevation, finds songs similar to the seed songs, and creates a playlist that perfectly fits the distance and time (based off of a user's pace). Harvy also allows a user to:
+
+- Reorder the playlist
+- Add songs
+- Sort by duration
+
+Lastly, a user can view the map, the elevation, and a timeline of when each song will be played (below). With the user's pace inputted, we can know at what point a user will be listening to a specific song. User's save this playlist to their Spotify account to listen to while they run.
+
+![Song List](../../images/5f0755c4908f313696b55771_Screen-Shot-2020-07-09-at-1.32.59-PM-p-800-1.png)
+
+![Song Timeline](../../images/5f0755c35d69bdc6481467d6_Screen-Shot-2020-07-09-at-1.33.27-PM-p-800.png)
+
+## Improving the Map
+
+Not long ago a similar orange-colored fitness app introduced the ability to draw with a user's finger on a map and create a route. One afternoon I decided to try and see just how hard developing the same feature would be. Surprisingly it worked out and Harvy supports the same kind of free draw in its own maps.
+![Route Drawing Git](../../images/5f0733074f4eccbaac53d812_Download-the-app.gif)
+
+## The future
+
+Harvy is still in active development although much of the time is now focused on the companion iOS app. Interested in helping out? Drop me a message or tweet at me - I would love to hear from you.
+![Harvy Banner](../../images/5f075781c44838d4dcbe5edf_Harvy_Logo_Color.png)
+
+<a href="https://harvy.app">
+  <button variant="link">Visit Harvy</button>
+</a>
