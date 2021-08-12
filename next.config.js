@@ -6,4 +6,3 @@ module.exports = withNextra({
     return config
   }
 })
-module.exports = withNextra()

@@ -55,7 +55,7 @@ Lastly, a PUT request to the Webflow API. I follow the documentation [https://de
 1. Make sure to update the `{CollectionID}` with your collection.
 2. The `{Webflow_ID}` is the ID of the Webflow item you are trying to update. In this scenario, it would be the User
 3. The fields `"name"`, `"slug"`, `"*archived"`, and `"*draft` are all _required_ in the request.
-4. For the "articles" field (this is the Posts), we want to pass in the Javascript output from the previous step into an array. So that is literally [{Result from previous step}] with the "[ ]" around the output. This is the format that Webflow accepts in their API
-5. Don't forget the Headers at the bottom along with your authorization token which you can find at [https://webflow.com/dashboard/sites/{website}/integrations](https://webflow.com/dashboard/sites/%7Bwebsite%7D/integrations)
+4. For the "articles" field (this is the Posts), we want to pass in the Javascript output from the previous step into an array. So that is literally `[{Result from previous step}] `with the "[ ]" around the output. This is the format that Webflow accepts in their API
+5. Don't forget the Headers at the bottom along with your authorization token which you can find at [https://webflow.com/dashboard/sites/your-website/integrations](https://webflow.com/dashboard/sites/%7Bwebsite%7D/integrations)
 
 ![Zapier](../images/5f05c50da64e9141ad34b4b0_screen-shot-2020-02-21-at-9.32.32-am.png)
