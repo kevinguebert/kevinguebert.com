@@ -23,5 +23,8 @@
     "tabWidth": 2,
     "trailingComma": "none",
     "semi": false
+  },
+  "devDependencies": {
+    "mini-css-extract-plugin": "^2.7.0"
   }
 }
