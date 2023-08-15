@@ -29,6 +29,7 @@ class MyDocument extends Document {
           <meta name="twitter:title" content={meta.title} />
           <meta name="twitter:description" content={meta.description} />
           <meta name="twitter:image" content={meta.image} />
+          <meta name="facebook-domain-verification" content="3e98d2i05cktvdnhpqac3645iuoavx" />
         </Head>
         <body>
           <Main />
